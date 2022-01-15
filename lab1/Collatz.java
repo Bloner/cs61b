@@ -8,7 +8,7 @@ public class Collatz {
     public static int nextNumber(int n) {
         if(n == 1)
             return 1;
-        if ((n & (n+1)) == 1) {
+        if ((n & 1) == 1) {
             return 3 * n + 1;
         } else{
             return n / 2;

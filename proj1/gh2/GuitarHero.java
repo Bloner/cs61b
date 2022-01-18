@@ -4,14 +4,17 @@ import edu.princeton.cs.algs4.StdAudio;
 import edu.princeton.cs.algs4.StdDraw;
 
 public class GuitarHero {
-    private String keyboard = "q2we4r5ty7u8i9op-[=zxdcfvgbnjmk,.;/' ";
+    private static String keyboard = "q2we4r5ty7u8i9op-[=zxdcfvgbnjmk,.;/' ";
 
     public static final double CONCERT_A = 440.0;
-    public static final double CONCERT_C = CONCERT_A * Math.pow(2, 3.0 / 12.0);
 
     public static void main(String[] args) {
         /* create two guitar strings, for concert A and C */
-        GuitarString[37] string;
+        GuitarString[] string = new GuitarString[37];
+        for (int i = 0; i < 37; i++) {
+            string[i] = new GuitarString(CONCERT_A *
+                    Math.pow(2, (i - 24.0) / 12.0));
+        }
 
         while (true) {
 
@@ -19,21 +22,23 @@ public class GuitarHero {
             if (StdDraw.hasNextKeyTyped()) {
                 char key = StdDraw.nextKeyTyped();
                 if (keyboard.indexOf(key) != -1) {
-                    stringA.pluck();
-                } else if (key == 'c') {
-                    stringC.pluck();
+                    string[keyboard.indexOf(key)].pluck();
                 }
             }
 
             /* compute the superposition of samples */
-            double sample = stringA.sample() + stringC.sample();
+            double sample = 0;
+            for (int i = 0; i < 37; i++) {
+                sample += string[i].sample();
+            }
 
             /* play the sample on standard audio */
             StdAudio.play(sample);
 
             /* advance the simulation of each guitar string by one step */
-            stringA.tic();
-            stringC.tic();
+            for (int i = 0; i < 37; i++) {
+                string[i].tic();
+            }
         }
     }
 }

@@ -75,7 +75,7 @@ public class ArrayDeque<T> implements Iterable<T>, Deque<T> {
     @Override
     public void printDeque() {
         int count = 0;
-        for (int i = firstIndex + 1; count < size; i++, count++){
+        for (int i = firstIndex + 1; count < size; i++, count++) {
             System.out.print(items[i % items.length] + " ");
         }
         System.out.println("");
@@ -120,10 +120,8 @@ public class ArrayDeque<T> implements Iterable<T>, Deque<T> {
     }
 
     public boolean equals(Object o) {
-        if (o instanceof Deque) {
-            int size1 = size;
-            int size2 = ((ArrayDeque<T>) o).size();
-            if (size1 == size2) {
+        if (o instanceof LinkedListDeque || o instanceof ArrayDeque) {
+            if (size == ((ArrayDeque<T>) o).size()) {
                 for (int i = 0; i < size; i++) {
                     if (!get(i).equals(((ArrayDeque<T>) o).get(i))) {
                         return false;

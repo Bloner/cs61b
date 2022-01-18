@@ -161,4 +161,14 @@ public class ArrayListTest {
         int a = arrayDeque.removeLast();
         assertEquals(0, a);
     }
+
+    @Test
+    public void equalTest() {
+        ArrayDeque<Integer> a = new ArrayDeque<>();
+        LinkedListDeque<Integer> b = new LinkedListDeque<>();
+        a.addFirst(1);
+        a.removeLast();
+        b.addFirst(1);
+        assertFalse(a.equals(b));
+    }
 }

@@ -114,7 +114,7 @@ public class LinkedListDeque<T> implements Iterable<T>, Deque<T> {
     }
 
     public boolean equals(Object o) {
-        if (o instanceof LinkedListDeque) {
+        if (o instanceof Deque) {
             Node curr1 = sentinel;
             Node curr2 = ((LinkedListDeque<T>) o).sentinel;
             int size1 = size;

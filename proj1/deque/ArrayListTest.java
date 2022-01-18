@@ -2,8 +2,6 @@ package deque;
 
 import org.junit.Test;
 
-import java.util.Comparator;
-
 import static org.junit.Assert.*;
 
 public class ArrayListTest {
@@ -101,8 +99,10 @@ public class ArrayListTest {
 
         boolean passed1 = false;
         boolean passed2 = false;
-        assertEquals("Should return null when removeFirst is called on an empty Deque,", null, lld1.removeFirst());
-        assertEquals("Should return null when removeLast is called on an empty Deque,", null, lld1.removeLast());
+        assertEquals("Should return null when removeFirst is called on an empty Deque,",
+                null, lld1.removeFirst());
+        assertEquals("Should return null when removeLast is called on an empty Deque,",
+                null, lld1.removeLast());
 
 
     }
@@ -136,7 +136,7 @@ public class ArrayListTest {
         arrayDeque.removeFirst();
         arrayDeque.addFirst(8);
         arrayDeque.addLast(9);
-        arrayDeque.removeFirst();//  22 13 12 9 11 16 18 21
+        arrayDeque.removeFirst();
         arrayDeque.addLast(11);
         arrayDeque.addFirst(12);
         arrayDeque.addFirst(13);

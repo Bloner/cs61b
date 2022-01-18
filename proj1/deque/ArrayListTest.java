@@ -1,18 +1,18 @@
 package deque;
 
 import org.junit.Test;
+
+import java.util.Comparator;
+
 import static org.junit.Assert.*;
 
 public class ArrayListTest {
-
     @Test
     /** Adds a few things to the list, checking isEmpty() and size() are correct,
      * finally printing the results.
      *
      * && is the "and" operation. */
     public void addIsEmptySizeTest() {
-
-        System.out.println("Make sure to uncomment the lines below (and delete this print statement).");
 
         ArrayDeque<String> lld1 = new ArrayDeque<String>();
 
@@ -39,8 +39,6 @@ public class ArrayListTest {
     /** Adds an item, then removes an item, and ensures that dll is empty afterwards. */
     public void addRemoveTest() {
 
-        System.out.println("Make sure to uncomment the lines below (and delete this print statement).");
-
         ArrayDeque<Integer> lld1 = new ArrayDeque<Integer>();
         // should be empty
         assertTrue("lld1 should be empty upon initialization", lld1.isEmpty());
@@ -58,8 +56,6 @@ public class ArrayListTest {
     @Test
     /* Tests removing from an empty deque */
     public void removeEmptyTest() {
-
-        System.out.println("Make sure to uncomment the lines below (and delete this print statement).");
 
         ArrayDeque<Integer> lld1 = new ArrayDeque<>();
         lld1.addFirst(3);
@@ -101,8 +97,6 @@ public class ArrayListTest {
     /* check if null is return when removing from an empty ArrayDeque. */
     public void emptyNullReturnTest() {
 
-        System.out.println("Make sure to uncomment the lines below (and delete this print statement).");
-
         ArrayDeque<Integer> lld1 = new ArrayDeque<Integer>();
 
         boolean passed1 = false;
@@ -117,8 +111,6 @@ public class ArrayListTest {
     /* Add large number of elements to deque; check if order is correct. */
     public void bigLLDequeTest() {
 
-        System.out.println("Make sure to uncomment the lines below (and delete this print statement).");
-
         ArrayDeque<Integer> lld1 = new ArrayDeque<Integer>();
         for (int i = 0; i < 1000000; i++) {
             lld1.addLast(i);
@@ -131,7 +123,42 @@ public class ArrayListTest {
         for (double i = 999999; i > 500000; i--) {
             assertEquals("Should have the same value", i, (double) lld1.removeLast(), 0.0);
         }
+    }
 
+    @Test
+    public void wrongTest() {
+        ArrayDeque<Integer> arrayDeque = new ArrayDeque<>();
+        arrayDeque.addLast(0);
+        arrayDeque.addLast(1);
+        arrayDeque.removeLast();
+        arrayDeque.addLast(5);
+        arrayDeque.removeFirst();
+        arrayDeque.removeFirst();
+        arrayDeque.addFirst(8);
+        arrayDeque.addLast(9);
+        arrayDeque.removeFirst();//  22 13 12 9 11 16 18 21
+        arrayDeque.addLast(11);
+        arrayDeque.addFirst(12);
+        arrayDeque.addFirst(13);
+        arrayDeque.addFirst(14);
+        arrayDeque.removeFirst();
+        arrayDeque.addLast(16);
+        arrayDeque.addFirst(17);
+        arrayDeque.addLast(18);
+        arrayDeque.removeFirst();
+        arrayDeque.addLast(21);
+        arrayDeque.addFirst(22);
+        int a = arrayDeque.get(3);
+        assertEquals(9, a);
+    }
 
+    @Test
+    public void wrongTest2() {
+        ArrayDeque<Integer> arrayDeque = new ArrayDeque<>();
+        for (int i = 0; i < 10; i++) {
+            arrayDeque.addFirst(i);
+        }
+        int a = arrayDeque.removeLast();
+        assertEquals(0, a);
     }
 }

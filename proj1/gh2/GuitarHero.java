@@ -12,8 +12,7 @@ public class GuitarHero {
         /* create two guitar strings, for concert A and C */
         GuitarString[] string = new GuitarString[37];
         for (int i = 0; i < 37; i++) {
-            string[i] = new GuitarString(CONCERT_A *
-                    Math.pow(2, (i - 24.0) / 12.0));
+            string[i] = new GuitarString(CONCERT_A * Math.pow(2, (i - 24.0) / 12.0));
         }
 
         while (true) {

@@ -3,6 +3,23 @@ package deque;
 import java.util.Iterator;
 
 public class ArrayDeque<T> implements Iterable<T>{
+    private class ArrayDequeIterator implements Iterator<T> {
+        private int wizPos;
+
+        public ArrayDequeIterator() {
+            wizPos = 0;
+        }
+
+        public boolean hasNext() {
+            return true;
+        }
+
+        public T next() {
+            T returnItem = items[wizPos];
+            wizPos += 1;
+            return returnItem;
+        }
+    }
 
     private T[] items;
     private int size;
@@ -79,23 +96,5 @@ public class ArrayDeque<T> implements Iterable<T>{
         //instance of
         //System.out.println(s instanceof Simple1);//true
         return true;
-    }
-
-    private class ArrayDequeIterator implements Iterator<T> {
-        private int wizPos;
-
-        public ArrayDequeIterator() {
-            wizPos = 0;
-        }
-
-        public boolean hasNext() {
-            return true;
-        }
-
-        public T next() {
-            T returnItem = items[wizPos];
-            wizPos += 1;
-            return returnItem;
-        }
     }
 }

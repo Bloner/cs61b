@@ -1,8 +1,10 @@
 package deque;
 
-public class LinkedListDeque<T> {
+import java.util.Iterator;
 
-    public class Node {
+public class LinkedListDeque<T> implements Iterable<T>{
+
+    private class Node {
         public T item;
         public Node prev;
         public Node next;
@@ -82,17 +84,15 @@ public class LinkedListDeque<T> {
         }
         return curr.item;
     }
+    public Iterator<T> iterator() {
+        return new LinkedListDequeIterator();
+    }
 
-     /* public Iterator<T> iterator() {
-
-        }
-
-        public boolean equals(Object o) {
+    public boolean equals(Object o) {
             //instance of
-            System.out.println(s instanceof Simple1);//true
-            return true;
-        }
-        */
+        //System.out.println(s instanceof Simple1);//true
+        return true;
+    }
 
     public T getRecursive(int index) {
         return getRecursiveHelper(index).item;
@@ -106,5 +106,18 @@ public class LinkedListDeque<T> {
             return sentinel.next;
         }
         return getRecursiveHelper(index - 1).next;
+    }
+
+    public class LinkedListDequeIterator implements Iterator<T> {
+        public LinkedListDequeIterator() {
+
+        }
+        public T next(){
+            return sentinel.item;
+        }
+
+        public boolean hasNext(){
+            return true;
+        }
     }
 }

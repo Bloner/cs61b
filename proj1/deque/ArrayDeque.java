@@ -1,7 +1,8 @@
 package deque;
 
-//add, remove, size, empty, get
-public class ArrayDeque<T> {
+import java.util.Iterator;
+
+public class ArrayDeque<T> implements Iterable<T>{
 
     private T[] items;
     private int size;
@@ -13,19 +14,19 @@ public class ArrayDeque<T> {
         items = (T []) new Object[8];
         size = 0;
         firstIndex = 0;
-        lastIndex = 0;
+        lastIndex = 1;
     }
     //System.arraycopy(items, 0, a, 0, size);
     //resize
     public void addFirst(T item){
-        firstIndex = (lastIndex == 0 ? 7 : firstIndex - 1);
         items[firstIndex] = item;
+        firstIndex = (lastIndex == 0 ? 7 : firstIndex - 1);
         size++;
     }
 
     public void addLast(T item){
-        lastIndex = (lastIndex == 7 ? 0 : lastIndex + 1);
         items[lastIndex] = item;
+        lastIndex = (lastIndex == 7 ? 0 : lastIndex + 1);
         size++;
     }
 
@@ -49,10 +50,9 @@ public class ArrayDeque<T> {
             return null;
         }
         size--;
-        T item = items[firstIndex];
         items[firstIndex] = null;
         firstIndex = (firstIndex == 7 ? 0 : firstIndex + 1);
-        return item;
+        return items[firstIndex];
     }
 
     public T removeLast(){
@@ -60,30 +60,42 @@ public class ArrayDeque<T> {
             return null;
         }
         size--;
-        T item = items[lastIndex];
         items[lastIndex] = null;
         lastIndex = (lastIndex == 0 ? 7 : lastIndex - 1);
-        return item;
+        return items[lastIndex];
     }
 
     public T get(int index){
         if (size <= index) {
             return null;
         }
-        return items[(firstIndex + index) % 8];
+        return items[(firstIndex + index + 1) % 8];
     }
-    /*public Iterator<T> iterator(){
-
+    public Iterator<T> iterator(){
+        return new ArrayDequeIterator();
     }
 
     public boolean equals(Object o){
         //instance of
-        System.out.println(s instanceof Simple1);//true
+        //System.out.println(s instanceof Simple1);//true
         return true;
     }
 
-    private class DequeIterator implements Iterator<T> {
+    private class ArrayDequeIterator implements Iterator<T> {
+        private int wizPos;
 
+        public ArrayDequeIterator() {
+            wizPos = 0;
+        }
+
+        public boolean hasNext() {
+            return true;
+        }
+
+        public T next() {
+            T returnItem = items[wizPos];
+            wizPos += 1;
+            return returnItem;
+        }
     }
-    */
 }

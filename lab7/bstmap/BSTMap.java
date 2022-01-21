@@ -124,30 +124,32 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
     }
 
     @Override
-    public Iterator<K> iterator() {
+    public BSTMapIterator iterator() {
         throw new UnsupportedOperationException("Don't support");
     }
 
     //print BSTMap in order of increasing Key
     public void printInOrder() {
-
+        throw new UnsupportedOperationException("Don't support");
     }
 
-    private class BSTMapIter implements Iterator<K> {
-
-        /** Create a new ULLMapIter by setting cur to the first node in the
-         *  linked list that stores the key-value pairs. */
-        public BSTMapIter() {
+    private class BSTMapIterator implements Iterator<K> {
+        private BSTNode curr;
+        public BSTMapIterator() {
+            curr = root;
         }
 
         @Override
         public boolean hasNext() {
-            return true;
+            return curr.size > 0;
         }
 
         @Override
         public K next() {
-            throw new UnsupportedOperationException("Don't support");
+            if (curr.left != null) {
+                return curr.left.key;
+            }
+            return curr.right.key;
         }
     }
 }

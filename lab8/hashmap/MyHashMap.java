@@ -1,6 +1,6 @@
 package hashmap;
 
-import java.util.*;
+import java.util.Collection;
 
 /**
  *  A hash table-backed Map implementation. Provides amortized constant time
@@ -18,7 +18,7 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
     protected class Node {
         K key;
         V value;
-        HashMap<Integer, Integer> a = new HashMap<>();
+
         Node(K k, V v) {
             key = k;
             value = v;

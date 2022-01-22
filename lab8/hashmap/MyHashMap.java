@@ -1,6 +1,11 @@
 package hashmap;
 
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
+import java.util.List;
+import java.util.ArrayList;
 
 /**
  *  A hash table-backed Map implementation. Provides amortized constant time
@@ -95,7 +100,7 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
      * OWN BUCKET DATA STRUCTURES WITH THE NEW OPERATOR!
      */
     protected Collection<Node> createBucket() {
-        return new ArrayList<>();
+        return null;
     }
 
     /**

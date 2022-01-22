@@ -139,7 +139,7 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
     }
 
     private Node getNode(K key) {
-        Collection<Node> c = buckets[calHash(key.hashCode())];
+        Collection<Node> c = buckets[calHash(key, size)];
         for (Node n: c) {
             if (n.key.equals(key)) {
                 return n;
@@ -158,7 +158,7 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
         if (items > size * loadFactor) {
             buckets = resize(size * 2);
         }
-        int index = calHash(key.hashCode());
+        int index = calHash(key, size);
         int flag = 0;
         for (Node n: buckets[index]) {
             if (n.key.equals(key)) {
@@ -180,7 +180,7 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
         }
         for (int i = 0; i < size; i++) {
             for (Node n: buckets[i]) {
-                temp[calHash(n.key.hashCode())].add(new Node(n.key, n.value));
+                temp[calHash(n.key, size)].add(new Node(n.key, n.value));
             }
         }
         size = capability;
@@ -213,8 +213,9 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
         return new MyHSIterator();
     }
 
-    private int calHash(int h) {
-        return h < 0 ? Math.floorMod(h, size) : h % size;
+    private int calHash(K key, int s) {
+        int h;
+        return (key == null) ? 0 : ((h = key.hashCode()) ^ (h >>> 16)) & (s - 1);
     }
 
     private class MyHSIterator implements Iterator<K>{

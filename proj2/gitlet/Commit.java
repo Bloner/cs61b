@@ -55,7 +55,8 @@ public class Commit implements Serializable {
         if (res.charAt(8) == '0') {
             res  = res.replaceFirst("0", "");
         }
+        res = res.replace("GMT ", "");
         res = res.replace("HKT ", "");
-        return res + " +0800";
+        return res + " +0000";
     }
 }

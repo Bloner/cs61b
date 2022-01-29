@@ -143,31 +143,30 @@ public class Repository {
     }
 
     public static void checkout(String fileName) {
-        File checkoutFile = join(CWD, fileName);
         File branch = join(GITLET_DIR, readContentsAsString(HEAD));
         String commitHash = readContentsAsString(branch);
-        File commitFile = join(COMMIT_DIR, commitHash);
-        Commit commitObj = Commit.fromFile(commitFile);
-        String fileHash = commitObj.map.getOrDefault(join(CWD,fileName).toString(), "None");
-        if (fileHash.equals("None")) {
-            System.out.println("File does not exist in that commit.");
-        }
-        else {
-            Blob fileInBlob = Blob.fromFile(join(BLOB_DIR, fileHash));
-            writeContents(checkoutFile, fileInBlob.getContent());
-        }
+        checkout(commitHash, fileName);
     }
 
     public static void checkout(String hash, String fileName) {
         List<String> filesInCommitFolder = plainFilenamesIn(COMMIT_DIR);
         List<String> commitPool = new ArrayList<>();
         for (String each: filesInCommitFolder) {
-            if(each.substring(0, hash.length() + 1).equals(hash)) {
+            if(each.equals(hash)) {
                 commitPool.add(each);
             }
         }
         if (commitPool.size() == 1) {
-            checkout(commitPool.get(0));
+            File commitFile = join(COMMIT_DIR, hash);
+            Commit commitObj = Commit.fromFile(commitFile);
+            String fileHash = commitObj.map.getOrDefault(join(CWD, fileName).toString(), "None");
+            if (fileHash.equals("None")) {
+                System.out.println("File does not exist in that commit.");
+            }
+            else {
+                Blob fileInBlob = Blob.fromFile(join(BLOB_DIR, fileHash));
+                writeContents(join(CWD, fileName), fileInBlob.getContent());
+            }
         }
         else if (commitPool.size() == 0) {
             System.out.println("No commit with that id exists.");

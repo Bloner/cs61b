@@ -1,26 +1,61 @@
 package gitlet;
 
-// TODO: any imports you need here
-
-import java.util.Date; // TODO: You'll likely use this in this class
+import java.io.File;
+import java.io.Serializable;
+import java.util.Date;
+import java.util.HashMap;
+import static gitlet.Utils.*;
 
 /** Represents a gitlet commit object.
- *  TODO: It's a good idea to give a description here of what else this Class
+ *  commit the file
  *  does at a high level.
  *
- *  @author TODO
+ *  @author Leon
  */
-public class Commit {
+public class Commit implements Serializable {
     /**
-     * TODO: add instance variables here.
      *
      * List all instance variables of the Commit class here with a useful
      * comment above them describing what that variable represents and how that
      * variable is used. We've provided one example for `message`.
      */
+    static final File COMMIT_DIR = join(new File(System.getProperty("user.dir")), ".gitlet", "commit");
+    String message;
+    Date timeStamp;
+    String parentId;
+    String secondParentId;
+    HashMap<String, String> map;
 
-    /** The message of this Commit. */
-    private String message;
+    public Commit(String m, Date d) {
+        this.message = m;
+        this.timeStamp = d;
+        this.map = new HashMap<>();
+    }
 
-    /* TODO: fill in the rest of this class. */
+    public Commit(String m, Date d, String p, HashMap<String, String> mp) {
+        this.message = m;
+        this.timeStamp = d;
+        this.parentId = p;
+        this.map = mp;
+    }
+
+    public String saveCommit() {
+        String hash = sha1(timeStamp.toString());
+        File outFile = join(COMMIT_DIR, hash);
+        writeObject(outFile, this);
+        return hash;
+    }
+
+    public static Commit fromFile(File inFile) {
+        return readObject(inFile, Commit.class);
+    }
+
+    public String toLocalDate() {
+        String res = this.timeStamp.toString();
+        if (res.charAt(8) == '0') {
+            res  = res.replaceFirst("0", "");
+        }
+        res = res.replace("HKT ", "");
+        return res + " +0800";
+    }
 }

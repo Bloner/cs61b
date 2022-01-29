@@ -1,7 +1,6 @@
 package capers;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.Serializable;
 import static capers.Utils.*;
 

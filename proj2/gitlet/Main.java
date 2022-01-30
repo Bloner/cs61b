@@ -46,10 +46,7 @@ public class Main {
                 // modification and untracked
                 break;
 
-            //this one
             case "checkout":
-                // checkout -- [file name]
-                // checkout [commit id] -- [file name]
                 if (args.length == 3 && args[1].equals("--")) {
                     Repository.checkout(args[2]);
                 }
@@ -59,8 +56,6 @@ public class Main {
                 else if (args.length == 2) {
                     // checkout [branch name]
                 }
-                else
-
                 break;
             case "branch":
                 // branch [branch name]

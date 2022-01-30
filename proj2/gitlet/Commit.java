@@ -40,7 +40,7 @@ public class Commit implements Serializable {
     }
 
     public String saveCommit() {
-        String hash = sha1(timeStamp.toString());
+        String hash = sha1(timeStamp.toString() + message);
         File outFile = join(COMMIT_DIR, hash);
         writeObject(outFile, this);
         return hash;

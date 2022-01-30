@@ -45,7 +45,7 @@ public class Repository {
             COMMIT_DIR.mkdir();
             STAGE_DIR.mkdir();
             writeContents(HEAD, "Master");
-            writeContents(MASTER_BRANCH, sha1(new Date(0).toString()));
+            writeContents(MASTER_BRANCH, sha1(new Date(0) + "initial commit"));
             makeCommit("initial commit", new Date(0));
         }
     }
@@ -120,14 +120,11 @@ public class Repository {
         }
         File branch = join(GITLET_DIR, readContentsAsString(HEAD));
         String commitHash = readContentsAsString(branch);
-        Boolean flag = true;
-        while (flag){
+        int  n = 0;
+        while (n < 4){
             File commitFile = helper.get(commitHash);
             Commit commitObj = Commit.fromFile(commitFile);
-            if (commitObj.parentId == null) {
-                flag = false;
-            }
-            String info;
+            String info = "";
             if (commitObj.secondParentId == null) {
                 info = String.format("===\ncommit %s\nDate: %s\n%s\n",
                         commitHash, commitObj.toLocalDate(), commitObj.message);
@@ -139,6 +136,10 @@ public class Repository {
             }
             System.out.println(info);
             commitHash = commitObj.parentId;
+            if (commitHash == null || commitHash.equals("")) {
+                break;
+            }
+            n++;
         }
     }
 

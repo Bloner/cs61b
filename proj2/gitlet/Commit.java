@@ -19,7 +19,8 @@ public class Commit implements Serializable {
      * comment above them describing what that variable represents and how that
      * variable is used. We've provided one example for `message`.
      */
-    static final File COMMIT_DIR = join(new File(System.getProperty("user.dir")), ".gitlet", "commit");
+    static final File COMMIT_DIR = join(new File(System.getProperty("user.dir")),
+                                ".gitlet", "commit");
     private String message;
     private Date timeStamp;
     private String parentId;
@@ -67,8 +68,7 @@ public class Commit implements Serializable {
         if (secondParentId == null) {
             info = String.format("===\ncommit %s\nDate: %s\n%s\n",
                     id, toLocalDate(), message);
-        }
-        else {
+        } else {
             info = String.format("===\ncommit %s\nMerge: %7s %7s\nDate: %s\n%s\n",
                     id, parentId, secondParentId, toLocalDate(), message);
         }

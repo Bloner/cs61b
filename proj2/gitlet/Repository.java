@@ -28,6 +28,7 @@ public class Repository {
 
     public static final File COMMIT_DIR = join(GITLET_DIR, "commit");
 
+
     public static final File STAGE_ADD_DIR = join(GITLET_DIR, "stage", "add");
 
     public static final File STAGE_DEL_DIR = join(GITLET_DIR, "stage", "del");
@@ -40,14 +41,14 @@ public class Repository {
         if (GITLET_DIR.exists()) {
             System.out.println("A Gitlet version-control system already exists in the current directory.");
             System.exit(-1);
-        }
-        else {
+        } else {
             GITLET_DIR.mkdir();
             BLOB_DIR.mkdir();
             COMMIT_DIR.mkdir();
-            STAGE_ADD_DIR.mkdir();
-            STAGE_DEL_DIR.mkdir();
-            BRANCH_DIR.mkdir();
+            STAGE_ADD_DIR.mkdirs();
+            STAGE_DEL_DIR.mkdirs();
+
+            BRANCH_DIR.mkdirs();
 
             Commit initialCommit = new Commit("initial commit", new Date(0));
             initialCommit.saveCommit();
@@ -100,15 +101,13 @@ public class Repository {
             String fileIdInMap = currentCommitMap.getOrDefault(b.getFileName(),"None");
             if (fileIdInMap.equals("None") || !fileIdInMap.equals(b.getID())) {
                 b.saveBlobInFile(join(STAGE_ADD_DIR, b.getID()));
-            }
-            else {
+            } else {
                 String ansHash = Blob.fromFile(join(BLOB_DIR, fileIdInMap)).getID();
                 if (ansHash.equals(b.getID())){
                     join(STAGE_ADD_DIR, ansHash).delete();
                 }
             }
-        }
-        else {
+        } else {
             System.out.println("File does not exist.");
         }
     }
@@ -152,8 +151,7 @@ public class Repository {
             String fileHash = commitObj.getMap().getOrDefault(join(CWD, fileName).toString(), "None");
             if (fileHash.equals("None")) {
                 System.out.println("File does not exist in that commit.");
-            }
-            else {
+            } else {
                 Blob fileInBlob = Blob.fromFile(join(BLOB_DIR, fileHash));
                 writeContents(join(CWD, fileName), fileInBlob.getContent());
             }
@@ -204,7 +202,7 @@ public class Repository {
 
     public static void remove(String fileName) {
         File rmFile = join(CWD, fileName);
-        HashMap<String, String> index = readObject(join(GITLET_DIR, "stage"), HashMap.class);
+        /*HashMap<String, String> index = readObject(join(GITLET_DIR, "stage"), HashMap.class);
         String fn = index.getOrDefault(rmFile.toString(), "None");
         if (!fn.equals("None")) {
             join(STAGE_ADD_DIR, fn).delete();
@@ -212,6 +210,7 @@ public class Repository {
         else {
 
         }
+        */
     }
 
     public static void findCommitIdThatHasTheMessage(String message) {

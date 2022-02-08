@@ -20,30 +20,32 @@ public class Commit implements Serializable {
      * variable is used. We've provided one example for `message`.
      */
     static final File COMMIT_DIR = join(new File(System.getProperty("user.dir")), ".gitlet", "commit");
-    String message;
-    Date timeStamp;
-    String parentId;
-    String secondParentId;
-    HashMap<String, String> map;
+    private String message;
+    private Date timeStamp;
+    private String parentId;
+    private String secondParentId;
+    private String id;
+    private HashMap<String, String> map;
 
     public Commit(String m, Date d) {
         this.message = m;
         this.timeStamp = d;
+        this.id = sha1(timeStamp.toString() + message);
         this.map = new HashMap<>();
     }
 
     public Commit(String m, Date d, String p, HashMap<String, String> mp) {
         this.message = m;
         this.timeStamp = d;
+        this.id = sha1(timeStamp.toString() + message);
         this.parentId = p;
         this.map = mp;
     }
 
     public String saveCommit() {
-        String hash = sha1(timeStamp.toString() + message);
-        File outFile = join(COMMIT_DIR, hash);
+        File outFile = join(COMMIT_DIR, id);
         writeObject(outFile, this);
-        return hash;
+        return id;
     }
 
     public static Commit fromFile(File inFile) {
@@ -58,5 +60,42 @@ public class Commit implements Serializable {
         res = res.replace("GMT ", "");
         res = res.replace("HKT ", "");
         return res + " +0000";
+    }
+
+    public void printLog() {
+        String info = "";
+        if (secondParentId == null) {
+            info = String.format("===\ncommit %s\nDate: %s\n%s\n",
+                    id, toLocalDate(), message);
+        }
+        else {
+            info = String.format("===\ncommit %s\nMerge: %7s %7s\nDate: %s\n%s\n",
+                    id, parentId, secondParentId, toLocalDate(), message);
+        }
+        System.out.println(info);
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public String getParentId() {
+        return parentId;
+    }
+
+    public Date getTimeStamp() {
+        return timeStamp;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public HashMap<String, String> getMap() {
+        return map;
+    }
+
+    public String getSecondParentId() {
+        return secondParentId;
     }
 }

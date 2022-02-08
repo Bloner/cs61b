@@ -22,54 +22,94 @@ public class Main {
                 break;
 
             case "add":
-                validateNumArgs("add", args, 2);
-                Repository.addFile(args[1]);
+                if (Repository.GITLET_DIR.exists()) {
+                    validateNumArgs("add", args, 2);
+                    Repository.addFile(args[1]);
+                }
                 break;
 
+            //To Do
             case "commit":
-                validateNumArgs("commit", args, 2);
-                Repository.makeCommit(args[1], new Date());
+                if (Repository.GITLET_DIR.exists()) {
+                    validateNumArgs("commit", args, 2);
+                    Repository.makeCommit(args[1], new Date());
+                }
                 break;
+
+            //To Do
             case "rm":
-                // rm [file name]
+                if (Repository.GITLET_DIR.exists()) {
+                    validateNumArgs("rm", args, 2);
+                    Repository.remove(args[1]);
+                }
                 break;
 
             case "log":
-                Repository.printLog();
-                break;
-            case "global-log":
-                break;
-            case "find":
-                // find [commit message]
-                break;
-            case "status":
-                // modification and untracked
+                if (Repository.GITLET_DIR.exists()) {
+                    Repository.printLog();
+                }
                 break;
 
+            case "global-log":
+                if (Repository.GITLET_DIR.exists()) {
+                    Repository.printGlobalLog();
+                }
+                break;
+
+            case "find":
+                if (Repository.GITLET_DIR.exists()) {
+                    validateNumArgs("find", args, 2);
+                    Repository.findCommitIdThatHasTheMessage(args[1]);
+                }
+                break;
+
+            //To Do
+            case "status":
+                if (Repository.GITLET_DIR.exists()) {
+                    validateNumArgs("status", args, 1);
+                    Repository.showStatus();
+                }
+                break;
+
+            //To Do
             case "checkout":
-                if (args.length == 3 && args[1].equals("--")) {
-                    Repository.checkout(args[2]);
-                }
-                else if (args.length == 4 && args[2].equals("--")) {
-                    Repository.checkout(args[1], args[3]);
-                }
-                else if (args.length == 2) {
-                    // checkout [branch name]
+                if (Repository.GITLET_DIR.exists()) {
+                    if (args.length == 3 && args[1].equals("--")) {
+                        Repository.checkout(args[2]);
+                    }
+                    else if (args.length == 4 && args[2].equals("--")) {
+                        Repository.checkout(args[1], args[3]);
+                    }
+                    else if (args.length == 2) {
+                        Repository.checkoutBranch(args[1]);// checkout [branch name]
+                    }
                 }
                 break;
+
             case "branch":
-                // branch [branch name]
-                // create a new branch with the given name
+                if (Repository.GITLET_DIR.exists()) {
+                    validateNumArgs("branch", args, 2);
+                    Repository.createBranch(args[1]);
+                }
                 break;
+
             case "rm-branch":
-                // rm-branch [branch name]
+                if (Repository.GITLET_DIR.exists()) {
+                    validateNumArgs("rm-branch", args, 2);
+                    Repository.removeBranch(args[1]);
+                }
                 break;
+
+            //To Do
             case "reset":
                 // reset [commit id]
                 break;
+
+            //To Do
             case "merge":
                 // merge [branch name]
                 break;
+
             default:
                 System.out.println("No command with that name exists.");
                 System.exit(-1);

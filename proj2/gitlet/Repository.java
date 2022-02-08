@@ -28,11 +28,13 @@ public class Repository {
 
     public static final File COMMIT_DIR = join(GITLET_DIR, "commit");
 
-    public static final File STAGE_DIR = join(GITLET_DIR, "stage");
+    public static final File STAGE_ADD_DIR = join(GITLET_DIR, "stage", "add");
+
+    public static final File STAGE_DEL_DIR = join(GITLET_DIR, "stage", "del");
+
+    public static final File BRANCH_DIR = join(GITLET_DIR, "refs", "local");
 
     public static final File HEAD = join(GITLET_DIR, "Head");
-
-    public static final File MASTER_BRANCH = join(GITLET_DIR, "Master");//装的是master最近的commit的hash值
 
     public static void setupPersistence() {
         if (GITLET_DIR.exists()) {
@@ -43,10 +45,14 @@ public class Repository {
             GITLET_DIR.mkdir();
             BLOB_DIR.mkdir();
             COMMIT_DIR.mkdir();
-            STAGE_DIR.mkdir();
-            writeContents(HEAD, "Master");
-            writeContents(MASTER_BRANCH, sha1(new Date(0) + "initial commit"));
-            makeCommit("initial commit", new Date(0));
+            STAGE_ADD_DIR.mkdir();
+            STAGE_DEL_DIR.mkdir();
+            BRANCH_DIR.mkdir();
+
+            Commit initialCommit = new Commit("initial commit", new Date(0));
+            initialCommit.saveCommit();
+            writeContents(HEAD, "refs/local/Master");
+            writeContents(join(BRANCH_DIR, "Master"), initialCommit.getId());
         }
     }
 
@@ -55,55 +61,50 @@ public class Repository {
             System.out.println("Please enter a commit message.");
             return;
         }
-        if (date.equals(new Date(0))) {
-            Commit newCommit = new Commit(message, date);
-            newCommit.saveCommit();
-            return;
-        }
-        List<String> stageFileNameList = plainFilenamesIn(STAGE_DIR);
+        List<String> stageFileNameList = plainFilenamesIn(STAGE_ADD_DIR);
         if (stageFileNameList.size() == 0) {
             System.out.println("No changes added to the commit.");
             return;
         }
         //create new commit object
         File branch = join(GITLET_DIR, readContentsAsString(HEAD));
-        String currentCommitHash = readContentsAsString(branch);
-        Commit currentCommit = Commit.fromFile(join(COMMIT_DIR, currentCommitHash));
-        Commit newCommit = new Commit(message, date, currentCommitHash , new HashMap<String, String>(currentCommit.map));
+        String currentCommitId = readContentsAsString(branch);
+        Commit currentCommit = Commit.fromFile(join(COMMIT_DIR, currentCommitId));
+        Commit newCommit = new Commit(message, date, currentCommitId , new HashMap<String, String>(currentCommit.getMap()));
         //copy and paste blob from stage to blob folder and update the hashmap;
-        for (String fileHash: stageFileNameList) {
-            File stageFile = join(STAGE_DIR, fileHash);
+        for (String fileId: stageFileNameList) {
+            File stageFile = join(STAGE_ADD_DIR, fileId);
             Blob b = Blob.fromFile(stageFile);
-            b.saveBlob();
-            String fileName = b.fileName;
-            newCommit.map.put(fileName, fileHash);
+            b.saveBlobInBlobDir();
+            String fileName = b.getFileName();
+            newCommit.getMap().put(fileName, fileId);
             stageFile.delete();
         }
         //serialize the commit into the commit folder and update the branch content.
         String newCommitHash = newCommit.saveCommit();
-        writeContents(branch, newCommitHash);// write back branch
+        writeContents(branch, newCommitHash);
     }
 
-    public static void addFile(String name) {
-        File addFile = join(CWD, name);
+    public static void addFile(String fileName) {
+        File addFile = join(CWD, fileName);
         if (addFile.exists()) {
             //create a blob object of this file
             Blob b = new Blob(addFile);
 
             //get the hashmap of the currentCommit
             File branch = join(GITLET_DIR, readContentsAsString(HEAD));
-            String currentCommitHash = readContentsAsString(branch);
-            HashMap<String, String> currentCommitMap = Commit.fromFile(join(COMMIT_DIR, currentCommitHash)).map;
+            String currentCommitId = readContentsAsString(branch);
+            HashMap<String, String> currentCommitMap = Commit.fromFile(join(COMMIT_DIR, currentCommitId)).getMap();
 
             //check if the file exist in the hashmap
-            String ans = currentCommitMap.getOrDefault(b.fileName,"None");
-            if (ans.equals("None") || !ans.equals(b.hash)) {
-                b.saveBlob(join(STAGE_DIR, b.hash));
+            String fileIdInMap = currentCommitMap.getOrDefault(b.getFileName(),"None");
+            if (fileIdInMap.equals("None") || !fileIdInMap.equals(b.getID())) {
+                b.saveBlobInFile(join(STAGE_ADD_DIR, b.getID()));
             }
             else {
-                String ansHash = Blob.fromFile(join(BLOB_DIR, ans)).hash;
-                if (ansHash.equals(b.hash)){
-                    join(STAGE_DIR, b.hash).delete();
+                String ansHash = Blob.fromFile(join(BLOB_DIR, fileIdInMap)).getID();
+                if (ansHash.equals(b.getID())){
+                    join(STAGE_ADD_DIR, ansHash).delete();
                 }
             }
         }
@@ -120,26 +121,14 @@ public class Repository {
         }
         File branch = join(GITLET_DIR, readContentsAsString(HEAD));
         String commitHash = readContentsAsString(branch);
-        int  n = 0;
-        while (n < 4){
+        while (true){
             File commitFile = helper.get(commitHash);
             Commit commitObj = Commit.fromFile(commitFile);
-            String info = "";
-            if (commitObj.secondParentId == null) {
-                info = String.format("===\ncommit %s\nDate: %s\n%s\n",
-                        commitHash, commitObj.toLocalDate(), commitObj.message);
-            }
-            else {
-                info = String.format("===\ncommit %s\nMerge: %7s %7s\nDate: %s\n%s\n",
-                        commitHash, commitObj.parentId, commitObj.secondParentId,
-                        commitObj.toLocalDate(), commitObj.message);
-            }
-            System.out.println(info);
-            commitHash = commitObj.parentId;
+            commitObj.printLog();
+            commitHash = commitObj.getParentId();
             if (commitHash == null || commitHash.equals("")) {
                 break;
             }
-            n++;
         }
     }
 
@@ -160,7 +149,7 @@ public class Repository {
         if (commitPool.size() == 1) {
             File commitFile = join(COMMIT_DIR, hash);
             Commit commitObj = Commit.fromFile(commitFile);
-            String fileHash = commitObj.map.getOrDefault(join(CWD, fileName).toString(), "None");
+            String fileHash = commitObj.getMap().getOrDefault(join(CWD, fileName).toString(), "None");
             if (fileHash.equals("None")) {
                 System.out.println("File does not exist in that commit.");
             }
@@ -172,5 +161,108 @@ public class Repository {
         else if (commitPool.size() == 0) {
             System.out.println("No commit with that id exists.");
         }
+    }
+
+    public static void checkoutBranch(String branchName) {
+        boolean checkRes = checkBranchExistsAndIsCurrentBranch(branchName,
+                "No need to checkout the current branch.", "No such branch exists.");
+        if (checkRes) {
+            //check untracked
+            //file once in the branch, changed now, but not tracked in the current branch; checkout will lose the change
+
+            //delete files in working dir, which was tracked in prev branch but not cur branch
+
+            //change branch from prev to cur
+            writeContents(HEAD, readContentsAsString(join(BRANCH_DIR, branchName)));
+
+            //clear stage
+            removeAllFilesInFolder(STAGE_ADD_DIR);
+            removeAllFilesInFolder(STAGE_DEL_DIR);
+        }
+        //a working file is untracked in the current branch and would be overwritten by the checkout
+        //>>There is an untracked file in the way; delete it, or add and commit it first.
+        //all file in the branchName -> working dir
+        //delete file that tracked in currentBranch but not in branchName
+    }
+
+    private static void removeAllFilesInFolder(File dirName) {
+        if (dirName.exists()) {
+            List<String> filesList = plainFilenamesIn(dirName);
+            for (String eachFile: filesList) {
+                join(dirName, eachFile).delete();
+            }
+        }
+    }
+
+    public static void printGlobalLog() {
+        List<String> filesInCommitFolder = plainFilenamesIn(COMMIT_DIR);
+        for (String eachCommitFile: filesInCommitFolder) {
+            Commit commitObj = Commit.fromFile(join(COMMIT_DIR, eachCommitFile));
+            commitObj.printLog();
+        }
+    }
+
+    public static void remove(String fileName) {
+        File rmFile = join(CWD, fileName);
+        HashMap<String, String> index = readObject(join(GITLET_DIR, "stage"), HashMap.class);
+        String fn = index.getOrDefault(rmFile.toString(), "None");
+        if (!fn.equals("None")) {
+            join(STAGE_ADD_DIR, fn).delete();
+        }
+        else {
+
+        }
+    }
+
+    public static void findCommitIdThatHasTheMessage(String message) {
+        List<String> filesInCommitFolder = plainFilenamesIn(COMMIT_DIR);
+        int count = 0;
+        for (String eachCommitFile: filesInCommitFolder) {
+            Commit commitObj = Commit.fromFile(join(COMMIT_DIR, eachCommitFile));
+            if (commitObj.getMessage().equals(message)) {
+                System.out.println(commitObj.getId());
+                count++;
+            }
+        }
+        if (count == 0) {
+            System.out.println("Found no commit with that message.");
+        }
+    }
+
+    public static void createBranch(String branchName) {
+        File currentBranch = join(GITLET_DIR, readContentsAsString(HEAD));
+        HashSet<String> branchSet = new HashSet<>(plainFilenamesIn(BRANCH_DIR));
+        if (branchSet.contains(branchName)) {
+            System.out.println("A branch with that name already exists.");
+        }
+        else {
+            writeContents(join(BRANCH_DIR, branchName), readContentsAsString(currentBranch));
+        }
+    }
+
+    public static void removeBranch(String branchName) {
+        Boolean checkRes = checkBranchExistsAndIsCurrentBranch(branchName,
+                "Cannot remove the current branch.", "A branch with that name does not exist.");
+        if (checkRes) {
+            File toBeRemovedBranch = join(BRANCH_DIR, branchName);
+            toBeRemovedBranch.delete();
+        }
+    }
+
+    private static boolean checkBranchExistsAndIsCurrentBranch(String branchName, String msg1, String msg2) {
+        String currentBranch = readContentsAsString(HEAD);
+        if (currentBranch.equals("refs/local/" + branchName)) {
+            System.out.println(msg1);
+            return false;
+        }
+        if (!join(BRANCH_DIR, branchName).exists()) {
+            System.out.println(msg2);
+            return false;
+        }
+        return true;
+    }
+
+    public static void showStatus() {
+
     }
 }

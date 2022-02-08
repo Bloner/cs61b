@@ -6,26 +6,25 @@ import java.io.Serializable;
 import static gitlet.Utils.*;
 
 public class Blob implements Serializable {
-    static final File BLOB_DIR = join(new File(System.getProperty("user.dir")), ".gitlet", "blob");
     private byte[] content;
-    public String fileName;
-    public String hash;
+    private String fileName; //absolute path
+    private String id;
 
     public Blob(File f) {
         this.content = readContents(f);
         this.fileName = f.toString();
-        this.hash = sha1(readContentsAsString(f) + fileName);
+        this.id = sha1(readContentsAsString(f) + fileName);
     }
 
-    public String saveBlob() {
-        File outFile = join(BLOB_DIR, hash);
+    public String saveBlobInBlobDir() {
+        File outFile = join(new File(System.getProperty("user.dir")), ".gitlet", "blob", id);
         writeObject(outFile, this);
-        return hash;
+        return id;
     }
 
-    public String saveBlob(File f) {
+    public String saveBlobInFile(File f) {
         writeObject(f, this);
-        return hash;
+        return id;
     }
 
     public static Blob fromFile(File infile) {
@@ -34,5 +33,13 @@ public class Blob implements Serializable {
 
     public byte[] getContent() {
         return content;
+    }
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public String getID() {
+        return id;
     }
 }
